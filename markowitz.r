@@ -1,5 +1,6 @@
 library("readr")
 library("MASS")
+library("ggplot2")
 
 # Import data 
 df <- read_csv('returns.csv')
@@ -25,7 +26,7 @@ Markowitz <- function(tau) {
 
 # Market Portfolio data
 
-rf <- (1 + 0.0446)^(-252) - 1
+rf <- (1 + 0.0446)^(-252) -1
 
 ZERO_n <- rep(0, ncol(df))
 
@@ -53,7 +54,6 @@ tocsv <- cbind(portfolio, returns_vec)
 write.csv(tocsv, file="market_portfolio.csv")
 
 Variance <- function(point, cov, riskfree=FALSE) {
-    print(riskfree)
     if (riskfree) {
         varaince <- sum(point[-1] * (cov %*% point[-1]))
     } else {
@@ -87,15 +87,12 @@ str(r)
 
 t = seq(0, 5, .01)
 
-eff_frontier <- sapply(t, sigma_mu)
+eff_frontier <- t(sapply(t, sigma_mu))
 eff_frontier_rf <- sapply(t, FUN = sigma_mu, riskfree=TRUE)
 
+colnames(eff_frontier) <- c("Variance", "Mean")
 
-
-plot(eff_frontier[1,], eff_frontier[2,])
-plot(eff_frontier_rf[1,], eff_frontier_rf[2,])
-
-
-MARKET_VAR <- sum(portfolio[-1] * C %*% portfolio[-1])
-MARKET_VAR
+eff_frontier.df <- data.frame(eff_frontier)
+eff_frontier.df
+ggplot(eff_frontier.df, aes(x = Variance, y=Mean)) + geom_line()
 

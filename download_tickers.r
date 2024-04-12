@@ -30,9 +30,16 @@ price.csv <- function(tickers) {
     write.matrix(df.returns, file="returns.csv", sep=",")
 }
 
-# Create list of ticker symbols. BRK-B is excluded due to problems importing
+market_cap.csv <- function(tickers) {
+    getQuote(ticker, what = yahooQF(c("Market Capitalization")))
+}
+
+# Create list of ticker symbols. BRK-B is excluded due to problems importing.
+# Also DOW, KHC and PYPL are omitted due to missing data.
 tickers <- data.frame(getSP100tickers())$Symbol[-c(19, 35, 54, 80)]
 
 # Write stock data to csv
 price.csv(tickers)
 
+
+getQuote("MSFT", what = yahooQF(c("Market Capitalization")))
