@@ -1,0 +1,12 @@
+Plan:
+- Indlæs historisk data fra Yahoo!. Brug lukkedata
+- Dan kovarians matrix
+- Lav løsning til CAPM'
+
+
+
+Problemer med aktier:
+BRK-B       19
+KHC         54
+PYPL        80
+DOW         35
