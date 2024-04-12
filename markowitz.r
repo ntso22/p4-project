@@ -93,6 +93,6 @@ eff_frontier_rf <- sapply(t, FUN = sigma_mu, riskfree=TRUE)
 colnames(eff_frontier) <- c("Variance", "Mean")
 
 eff_frontier.df <- data.frame(eff_frontier)
-eff_frontier.df
+
 ggplot(eff_frontier.df, aes(x = Variance, y=Mean)) + geom_line()
 
