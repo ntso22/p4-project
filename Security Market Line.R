@@ -4,8 +4,8 @@ library("quantmod")
 
 #Importing the Data
 library(readr)
-prices <- read_csv("C:/Users/Nicol/OneDrive/UNI/4. Semester/P4/prices.csv")
-returns <- read_csv("C:/Users/Nicol/OneDrive/UNI/4. Semester/P4/returns.csv")
+prices <- read_csv("prices.csv")
+returns <- read_csv("returns.csv")
 
 #Calculates the number of assets
 n = as.numeric(ncol(prices))
@@ -20,7 +20,7 @@ rf = 0.0446
 beta_theory = seq(0,2,0.01)
 
 #Import Market Portfolio
-market_portfolio <- read_csv("C:/Users/Nicol/OneDrive/UNI/4. Semester/P4/market_portfolio.csv")
+market_portfolio <- read_csv("market_portfolio.csv")
 
 #Daily returns of the market portfolio
 market_daily = (as.matrix(returns)%*%as.matrix(market_portfolio[-1,2]))
