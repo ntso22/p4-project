@@ -1,0 +1,156 @@
+library("readr")
+library("MASS")
+library("quantmod")
+library('rlist')
+library("IntroCompFinR")
+
+
+
+
+
+# Import data 
+df <- read_csv('returns.csv')
+
+rownames(df)
+
+#Expected return
+
+m <- apply(df,2,mean) 
+
+#m <- ((m1 + 1)^252 - 1)
+
+
+variance <- apply(df,2,var)
+
+# Define covariance matrix and expected return vector
+
+V <- cov(df)
+
+W <- solve(V)
+
+risk_free <- 0.0446/252
+
+e=rep(1,length(df))
+
+#Definer "MAGIC" numbers
+
+
+A = sum(e * (W %*% m))
+
+B = sum(m * (W %*% m))
+
+C = sum(e * (W %*% e))
+
+D = B*C - A^2
+
+H=risk_free^2*C - 2*risk_free*A+B
+
+
+return_x <- function(x){
+  ja = risk_free + (x)/2*H[1]
+  return (ja)
+} 
+
+
+
+#Use formula for the Tangency Portfolio found in MFE page 47
+
+tangency_portfolio <-as.vector(1/(A-risk_free*C)*(W%*%(m-risk_free*e)))
+
+tangency_portfolio_return <- sum(tangency_portfolio * m)
+
+tangency_portfolio_variance <- sum(tangency_portfolio * (V %*% tangency_portfolio))
+
+tangency_portfolio_std <- sqrt(tangency_portfolio_variance)
+
+
+#Doublecheck result by applying IntroCompFinR function
+tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=TRUE)
+
+#uden shorting
+
+tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=FALSE)
+
+
+#Efficient frontier for risky assets
+
+
+# (fejl. den er lineær i return funktion så denne kunne undlades med nye x værdier) 
+# CML (efficient frontier i std-return planen med risk free) med værdier så tangentporteføljen er garanteret at være med
+x <- seq(0,0.5, .1)
+plot((return_x(x)-risk_free)/sqrt(H) ,return_x(x), type ="l",main ="Capital market line, tangent portfolio (red)", xlab=expression(sigma[x]),ylab=expression(r[x]))
+points(tangency_portfolio_std, tangency_portfolio_return, col = "red", pch = 19)
+points(0,risk_free, col="green",pch=19)
+text(0, 0.002, labels=expression(paste("(0,",r[f],")")))
+
+
+
+#risky std som funktion af return (tau er udeladt)
+
+risky_std <- function(x){
+  sqrt((1/D)*(C*x^2-2*A*x+B))
+}
+
+#Efficient frontier only risky including tangent portfolio
+
+x <- seq(A/C,tangency_portfolio_return*4, .001)
+plot(risky_std(x),x,type='l', xlab = expression(r[x]), ylab = expression(sigma[x]), main = "Efficient frontier only risky assets and tangent portfolio (red)")
+points(tangency_portfolio_std,tangency_portfolio_return, col = 'red', pch=19)
+
+
+#Capital market line (efficient frontier med risk free)(sort) plottet med
+#efficient frontier for risky assets (blå) og tangent portefølje (rød)
+
+liste1 <- c()
+liste2 <- c()
+
+for (j in seq(A/C,tangency_portfolio_return*4, .0001)){
+  liste1 <- list.append(liste1,risky_std(j))
+  liste2 <- list.append(liste2,j)
+}
+
+x <- seq(0,0.8, .01)
+plot((return_x(x)-risk_free)/sqrt(H) ,return_x(x), type ="l",main="Tangency portfolio (red)", xlab = expression(sigma[x]),ylab=expression(r[x]) )
+points(tangency_portfolio_std, tangency_portfolio_return, col = "red", pch = 19)
+#points(liste1, liste2, col = "blue", pch = 19)
+lines(liste1, liste2, col = "blue", pch = 19)
+points(0,0,col="green",pch=19)
+text(0, 0.002, labels=expression(paste("(0,",r[f],")")))
+
+
+
+
+#Sharpe ratio function for risky efficient frontier
+sharpe <- function(x){
+  lol = (x-risk_free)/risky_std(x)
+  return(lol)
+}
+
+
+#Tangent portefølje burde maksimere denne funktion bemærk hvordan den er en funktion udelukkende af return
+
+x <- seq(A/C,tangency_portfolio_return*8, .001)
+plot(x,(x-risk_free)/risky_std(x),type='l', xlab= expression(r[x]),ylab="Sharpe")
+
+
+#Check that tangent portfolio gives highest sharpe ratio on the risky efficient frontier
+optimise(sharpe, lower = A/C, upper = tangency_portfolio_return*2, maximum = TRUE)
+
+
+#Values to check if the above is correct (it is close enough)
+tangency_portfolio_return
+sharpe(tangency_portfolio_return)
+
+#estimeret annual return
+
+tangency_portfolio_return
+tangency_portfolio_annualreturn <- ((tangency_portfolio_return+1)^252-1)*100
+tangency_portfolio_annualreturn 
+
+#uden shorting tilladt er daglig expected return
+uden_short_tan_port_daily_return <- 0.001325356 
+
+#uden shorting, annual return
+((uden_short_tan_port_daily_return+1)^252-1)*100
+
+#indikerer at der er sket en fejl (måske covmat)
