@@ -26,7 +26,7 @@ Markowitz <- function(tau) {
 
 # Market Portfolio data
 
-rf <- (1 + 0.0446)^(-252) -1
+rf <- (1 + 0.0446)^(1/365) -1
 
 ZERO_n <- rep(0, ncol(df))
 
