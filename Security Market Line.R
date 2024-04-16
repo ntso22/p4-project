@@ -10,7 +10,7 @@ returns <- read_csv("returns.csv")
 #Calculates the number of assets
 n = as.numeric(ncol(prices))
 
-#Calculate the expected return of S&P100
+#Calculate the expected return of all assets in the S&P100
 sample_means = apply(returns, 2, mean)
 
 #Risk Free Asset
@@ -19,22 +19,21 @@ rf = (1+0.0446)^{1/365}-1
 #Range of beta
 beta_theory = seq(0,2,0.01)
 
-#Import Market Portfolio
+#Import the S&P 100 Index
 market_portfolio <- tq_get('^SP100',
                     from = '2015-01-01',
                     to = '2020-01-01',
                     get = 'stock.prices')[,8]
 
-#Daily returns of the SP100
-
+#Daily returns of the S&P100 Index
 market_daily <- na.omit(market_portfolio / lag(market_portfolio)) - 1
 
 
-#Calculates the expected return and variance of the market portfolio
+#Calculates the expected return and variance of the S&P100 Index
 rm = as.numeric(apply(market_daily, 2, mean))
 market_var = var(market_daily)[1,1]
 
-#Calculates the covariance between asset i and the market portfolio
+#Calculates the covariance between asset i and the S&P100 Index
 covar = function(i) {
   cov(market_daily, returns[,i])
 }
@@ -71,5 +70,6 @@ SML <- ggplot(df_data , aes(x = x, y = y, color = colnames(returns))) +
   theme(legend.position = "none") +
   labs(x = "Beta", y = "Expected Daily Return")
 SML
+
 
 
