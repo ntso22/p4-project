@@ -3,6 +3,7 @@ library("readr")
 library("quantmod")
 library("tidyverse")
 library("ggplot2")
+library("rlist")
 
 prices24 <- read_csv("prices_24.csv")
 returns24 <- read_csv("returns_24.csv")
@@ -65,6 +66,30 @@ market_matrix <- cbind(returns_marketport, marketport_x)
 ggplot(data=market_matrix, aes(x=marketport_x, y=returns_marketport))+labs(x='Days',y='Returns')+ geom_line()+geom_line(data = matrix_sp100, aes(days,returns),color="red")
 
 #ggplot(data=market_matrix, aes(x=marketport_x, y=returns_marketport),color="red")+geom_line()
+
+
+
+liste5 <- c(1,1+(1*returns_sp100_1[1]))
+liste6 <- c(1,1+(1*returns_marketport[1]))
+liste7<- c(1,2)
+
+for (j in seq(3,length(returns_sp100), 1)){
+  liste5 <- list.append(liste5,liste5[j-1]*(1+returns_sp100_1[j-1]))
+  liste6 <- list.append(liste6,liste6[j-1]*(1+returns_marketport[j-1]))
+  liste7 <- list.append(liste7,j)
+}
+
+returns_marketport2 <- as.matrix(liste6)
+returns_sp100_2 <- as.matrix(liste5)
+x <- as.matrix(liste7)
+colnames(returns_marketport2) <- "returns market"
+colnames(returns_sp100_2) <- "returns sp100"
+colnames(x) <- "days"
+
+matrix_new <- cbind(returns_marketport2, returns_sp100_2, x)
+
+ggplot(data=matrix_new, aes(x=x, y= returns_marketport2))+geom_line()+geom_line(data=matrix_new, aes(x=x,y=returns_sp100_2), color="red")
+
 
 
 
