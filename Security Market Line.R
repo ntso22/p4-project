@@ -21,9 +21,9 @@ beta_theory = seq(0,2,0.01)
 
 #Import the S&P 100 Index
 market_portfolio <- tq_get('^SP100',
-                    from = '2015-01-01',
-                    to = '2020-01-01',
-                    get = 'stock.prices')[,8]
+                           from = '2015-01-01',
+                           to = '2020-01-01',
+                           get = 'stock.prices')[,8]
 
 #Daily returns of the S&P100 Index
 market_daily <- na.omit(market_portfolio / lag(market_portfolio)) - 1
@@ -63,6 +63,7 @@ for (i in 1:n){
 df_data <- data.frame(x,y,colnames(returns))
 df_sml <- data.frame(beta_theory = beta_theory, sml = sml(beta_theory))
 
+#Plots the SML for all assets
 SML <- ggplot(df_data , aes(x = x, y = y, color = colnames(returns))) + 
   geom_point(size = 2) + 
   geom_line (data = df_sml , aes(x = beta_theory, y = sml), color = "black") +
@@ -71,5 +72,18 @@ SML <- ggplot(df_data , aes(x = x, y = y, color = colnames(returns))) +
   labs(x = "Beta", y = "Expected Daily Return")
 SML
 
+#Creates dataframs for plotting the assets with the highest and lowest weights
+x_1 = c(beta("JPM")[1,1], beta("NEE")[1,1], beta("GOOGL")[1,1], beta("GD")[1,1], beta("DUK")[1,1], beta("CL")[1,1])
+y_1 = c(sample_means["JPM"], sample_means["NEE"], sample_means["GOOGL"], sample_means["GD"], sample_means["DUK"], sample_means["CL"])
+asset_names = c("JPM", "NEE", "GOOGL", "GD", "DUK", "CL")
 
+df_data2 <- data.frame(x_1,y_1, asset_names)
 
+# Plots the SML for selected assets
+SML <- ggplot(df_data2 , aes(x = x_1, y = y_1, color = asset_names)) + 
+  geom_point(size = 2) + 
+  geom_line(data = df_sml, aes(x = beta_theory, y = sml), color = "black") +
+  geom_text(aes(label = asset_names), vjust = -0.5, hjust = 1) +
+  theme(legend.position = "none") +
+  labs(x = "Beta", y = "Expected Daily Return") + ylim(0,0.003)
+SML
