@@ -29,13 +29,6 @@ return_4 = Delt(lukke_4,type = c("arithmetic"))
 return_5 = Delt(lukke_5,type = c("arithmetic"))
 return_6 = Delt(lukke_6,type = c("arithmetic"))
 
-#Creates a plot of  the daily returns
-plot(return)
-
-#Creates a histogram of the returns
-ggplot(data = return) +
-  geom_histogram(aes(x = return), bins = 100)
-
 #to Create a Q-Q plot
 sorted_return_1 <- sort(return_1)
 sorted_return_2 <- sort(return_2)
