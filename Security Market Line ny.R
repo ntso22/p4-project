@@ -74,9 +74,6 @@ SML <- ggplot(df_data , aes(x = x, y = y, color = colnames(returns))) +
 SML
 
 
-
-
-
 #Creates dataframes for plotting the assets with the highest and lowest weights
 x_1 = c(beta("JPM")[1,1], beta("NEE")[1,1], beta("GOOGL")[1,1], beta("GD")[1,1], beta("DUK")[1,1], beta("CL")[1,1])
 y_1 = c(sample_means["JPM"], sample_means["NEE"], sample_means["GOOGL"], sample_means["GD"], sample_means["DUK"], sample_means["CL"])
@@ -91,4 +88,24 @@ SML <- ggplot(df_data2 , aes(x = x_1, y = y_1, color = asset_names)) +
   geom_text(aes(label = asset_names), vjust = -0.5, hjust = 1) +
   theme(legend.position = "none") +
   labs(x = "Beta", y = "Expected Daily Return") + ylim(0,0.003)
+SML
+
+#Calculate the Daily Returns of the Tangency Portfolio and the expected return of the tagency portfolio
+tangency_portfolio = read_csv("market_portfolio.csv")
+tangency_return = as.matrix(returns) %*% as.matrix(tangency_portfolio[2:98,2])
+tangency_expected = mean(tangency_return)
+
+#Calculates the beta
+covariance = cov(tangency_return,market_daily)
+tangency_beta = covariance/market_var
+
+#Plots the tangency portfolio on the SML
+df_data3 = data.frame(tangency_beta,tangency_expected)
+
+SML <- ggplot(df_data3 , aes(x = df_data3$adjusted, y = tangency_expected)) + 
+  geom_point(size = 2) + 
+  geom_line(data = df_sml, aes(x = beta_theory, y = sml), color = "black") +
+  geom_text(label = "Tangency Portfolio", vjust = -0.5, hjust = 1) +
+  theme(legend.position = "none") +
+  labs(x = "Beta", y = "Expected Daily Return") + ylim(0,0.01)
 SML
