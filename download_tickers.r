@@ -14,7 +14,7 @@ price.csv <- function(tickers) {
     price.matrix <- matrix()
     returns.matrix <- matrix()
     for (ticker in tickers) { # Generates matrix with historical prices for individual stocks as columns
-        loadSymbols(ticker, src = "yahoo", from="2015-01-01", to="2020-01-01")
+        loadSymbols(ticker, src = "yahoo", from="2013-01-01", to="2016-01-01")
         price.matrix <- cbind(price.matrix, Ad(get(ticker)))
         returns.matrix <- cbind(returns.matrix, Delt(Ad(get(ticker))))
     }
@@ -30,20 +30,9 @@ price.csv <- function(tickers) {
     write.matrix(df.returns, file="returns.csv", sep=",")
 }
 
-# Generate market cap
-market_cap.csv <- function(tickers) {
-    for (ticker in tickers) {
-        url <- paste("https://finance.yahoo.com/quote/", ticker)
-        html <- html_table(html_nodes(read_html(url), "#constituents"))
-    }
-}
-
 # Create list of ticker symbols. BRK-B is excluded due to problems importing.
 # Also DOW, KHC and PYPL are omitted due to missing data.
 tickers <- data.frame(getSP100tickers())$Symbol[-c(19, 35, 54, 80)]
 
 # Write stock data to csv
 price.csv(tickers)
-
-
-getHisMktCap(AAPL, 20150101, 20200101)
