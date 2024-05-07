@@ -6,7 +6,6 @@ library("quantmod")
 # Metadata
 RETURNS <- data.frame(read_csv("returns_15_24.csv"))
 rf <- (1 + 0.0005351351)^(1/365) -1
-test <- data.frame(read_csv("market_portfolio.csv"))[2]
 
 MEMORY <- 504 # Determines the amount of trading days, the historic returns are calculated with
 
