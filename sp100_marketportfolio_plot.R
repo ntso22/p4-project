@@ -2,16 +2,18 @@
 library("readr")
 library("quantmod")
 library("tidyverse")
+library("tidyquant")
 library("ggplot2")
 library("rlist")
 
-prices24 <- read_csv("prices_24.csv")
-returns24 <- read_csv("returns_24.csv")
+
+prices24 <- read_csv("prices_13_19.csv")
+returns24 <- read_csv("returns_13_19.csv")
 market_portfolio <- read.csv("market_portfolio.csv")[,2]
 
 index <- tq_get('^SP100',
-                from = '2019-12-31',
-                to= '2024-4-17',
+                from = '2013-1-1',
+                to= '2019-1-11',
                 get ='stock.prices')[,8]
 
 
@@ -67,6 +69,9 @@ ggplot(data=market_matrix, aes(x=marketport_x, y=returns_marketport))+labs(x='Da
 
 #ggplot(data=market_matrix, aes(x=marketport_x, y=returns_marketport),color="red")+geom_line()
 
+returns_marketport
+
+cor(returns_sp100_1,returns_marketport)
 
 
 liste5 <- c(1,1+(1*returns_sp100_1[1]))
@@ -88,8 +93,10 @@ colnames(x) <- "days"
 
 matrix_new <- cbind(returns_marketport2, returns_sp100_2, x)
 
-ggplot(data=matrix_new, aes(x=x, y= returns_marketport2))+geom_line()+geom_line(data=matrix_new, aes(x=x,y=returns_sp100_2), color="red")
+ggplot(data=matrix_new, aes(x=x, y= returns_marketport2))+geom_line(size=1)+geom_line(size=1,data=matrix_new, aes(x=x,y=returns_sp100_2), color="red")+labs(x="Days",y="Index")
 
+
+returns_sp100_2
 
 
 
