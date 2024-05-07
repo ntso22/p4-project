@@ -6,6 +6,7 @@ library("quantmod")
 # Metadata
 RETURNS <- data.frame(read_csv("returns_15_24.csv"))
 rf <- (1 + 0.0005351351)^(1/365) -1
+test <- data.frame(read_csv("market_portfolio.csv"))[2]
 
 MEMORY <- 504 # Determines the amount of trading days, the historic returns are calculated with
 
@@ -48,12 +49,7 @@ create_index <- function(tau, price_index) {
 df <- create_index(0.2455255, 100)
 
 ggplot() + 
-    geom_line(data = df, aes(x=index(df$Markowitz), y=Markowitz), color=, size=1.5) +
+    geom_line(data = df, aes(x=index(df$Markowitz), y=Markowitz), color="black", size=1.5) +
     geom_line(data = df, aes(x=index(df$GSPC.Adjusted), y=GSPC.Adjusted), color="S&P100", size=1.5) +
-    labs(x="Days", y="Index") +
-    scale_color_manual(values = c("black" = "black", "red" = "red"))
+    labs(x="Days", y="Index")
 ggsave(file="images/dynamic_portfolio.png", width=16, height=9, dpi=300)
-
-
-
-
