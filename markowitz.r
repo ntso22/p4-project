@@ -41,6 +41,7 @@ Y <- append(y_star, y_0, 0)
 
 # Finding market portfolio
 tau_MARKET <- -(2 / (y_0))
+tau_MARKET
 
 Markowitz_risk_free <- function(rf, y, tau) {
     opt_portfolio <- RISK_FREE_PORTFOLIO + tau * y / 2
@@ -53,9 +54,10 @@ tocsv <- cbind(portfolio, returns_vec)
 
 write.csv(tocsv, file="market_portfolio.csv")
 
-Variance <- function(point, cov, riskfree=FALSE) {
+Variance <- function(point, cov, riskfree=FALSE, tau) {
     if (riskfree) {
-        varaince <- sum(point[-1] * (cov %*% point[-1]))
+        alpha <- (tau_MARKET - tau) / tau_MARKET
+        variance <- (1 - alpha) * sqrt(sum(point[-1] * (cov %*% point[-1])))
     } else {
         variance <- sum(point * (cov %*% point))
     }
@@ -79,20 +81,30 @@ sigma_mu <- function(tau, riskfree=FALSE) {
         point <- Markowitz(tau)
     }
     mu <- portfolio_mean(point, r, riskfree)
-    sigma <- Variance(point, C, riskfree)
+    sigma <- Variance(point, C, riskfree, tau)
     return (cbind(sigma, mu))
 }
 
-str(r)
-
+# Plot mean-variance diagrams
 t = seq(0, 5, .01)
+t_rf = seq(0, tau_MARKET * 2, tau_MARKET/250)
 
 eff_frontier <- t(sapply(t, sigma_mu))
-eff_frontier_rf <- sapply(t, FUN = sigma_mu, riskfree=TRUE)
+eff_frontier_rf <- t(sapply(t_rf, FUN = sigma_mu, riskfree=TRUE))
 
-colnames(eff_frontier) <- c("Variance", "Mean")
+label <- c("Variance", "Mean")
+colnames(eff_frontier_rf) <- label
+colnames(eff_frontier) <- label
 
 eff_frontier.df <- data.frame(eff_frontier)
+eff_frontier_rf.df <- data.frame(eff_frontier_rf)
 
-ggplot(eff_frontier.df, aes(x = Variance, y=Mean)) + geom_line()
+both_efficient <- rbind(eff_frontier.df, eff_frontier_rf.df)
 
+plotrf <- ggplot(eff_frontier_rf.df, aes(x=Variance, y=Mean)) + geom_line()
+plotrisk <- ggplot(eff_frontier.df, aes(x = Variance, y=Mean)) + geom_line()
+
+plotrf
+plotrisk
+
+ggplot(both_efficient, aes(x=Variance, y=Mean)) + geom_point()
