@@ -30,8 +30,12 @@ price.csv <- function(tickers) {
     write.matrix(df.returns, file="returns.csv", sep=",")
 }
 
+# Generate market cap
 market_cap.csv <- function(tickers) {
-    getQuote(ticker, what = yahooQF(c("Market Capitalization")))
+    for (ticker in tickers) {
+        url <- paste("https://finance.yahoo.com/quote/", ticker)
+        html <- html_table(html_nodes(read_html(url), "#constituents"))
+    }
 }
 
 # Create list of ticker symbols. BRK-B is excluded due to problems importing.
@@ -42,4 +46,4 @@ tickers <- data.frame(getSP100tickers())$Symbol[-c(19, 35, 54, 80)]
 price.csv(tickers)
 
 
-getQuote("MSFT", what = yahooQF(c("Market Capitalization")))
+getHisMktCap(AAPL, 20150101, 20200101)
