@@ -8,8 +8,6 @@ cor_matrix <- cor(RETURNS)
 
 cor_df <- rev(data.frame(id=colnames(cor_matrix), cor_matrix))
 
-cor_df$IBM
-
 gg <- melt(cor_df, id="id")
 
 ggplot(gg, aes(x=id, y=variable, fill=value)) +
