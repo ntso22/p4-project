@@ -28,7 +28,7 @@ V <- cov(df)
 
 W <- solve(V)
 
-risk_free <- (1+0.0446)^(1/365)-1
+risk_free <- (1+0.0005351351)^(1/365)-1
 
 risk_free
 
@@ -74,7 +74,10 @@ tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=TRUE)
 
 #uden shorting
 
-tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=FALSE)
+which.max(tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=FALSE)$weights)
+
+which.max(tangency.portfolio(as.vector(matrix(m)),V,risk_free,shorts=TRUE)$weights)
+
 
 
 #Efficient frontier for risky assets
@@ -146,7 +149,7 @@ matrix_riskfree <- cbind(riskfree_liste, riskfree_x)
 liste1 <- c()
 liste2 <- c()
 
-for (j in seq(A/C,tangency_portfolio_return*10, .0001)){
+for (j in seq(A/C,tangency_portfolio_return*5, .0001)){
   liste1 <- list.append(liste1,risky_std(j))
   liste2 <- list.append(liste2,j)
 }
@@ -160,7 +163,11 @@ colnames(risky_x) <- "x"
 matrix_risky <- cbind(risky_liste, risky_x)
 
 ggplot(data=matrix_risky, mapping = aes(x=std,y=x))+ geom_line()+
-  geom_line(data=matrix_riskfree, mapping = aes(x=std, y=x), color="red")+labs(x=expression(sigma[x]),y=expression(r[x]))+geom_point(aes(x=tangency_portfolio_std, y=tangency_portfolio_return))+coord_fixed(4)
+  geom_line(data=matrix_riskfree, mapping = aes(x=std, y=x), color="red")+labs(x=expression(sigma[w]),y=expression(r[w]))+geom_point(aes(x=tangency_portfolio_std, y=tangency_portfolio_return))+xlim(0,0.08)+ylim(0,0.03)+coord_fixed(2)
+
+ggsave(file="tangency_portfolio.png",width=9,height=9,dpi=300)
+
+
 
 
 tangency_portfolio_std
@@ -168,6 +175,7 @@ tangency_portfolio_std
 tangency_tau <- 2/(A-risk_free*C)
 
 tangency_tau
+
 
 #+ylim(0,0.011)+xlim(0,0.04)
 
@@ -204,6 +212,9 @@ uden_short_tan_port_daily_return <- 0.001325356
 
 #uden shorting, annual return
 ((uden_short_tan_port_daily_return+1)^252-1)*100
+
+#indikerer at der er sket en fejl (måske covmat)
+
 
 #indikerer at der er sket en fejl (måske covmat)
 
